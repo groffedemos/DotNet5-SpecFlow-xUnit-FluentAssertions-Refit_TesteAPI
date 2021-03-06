@@ -52,7 +52,7 @@ jobs:
         docker tag ${{ env.IMAGEM_AZURECR }}:latest ${{ env.IMAGEM_AZURECR }}:$GITHUB_RUN_NUMBER
         docker push --all-tags ${{ env.IMAGEM_AZURECR }}
 
-    - name: Upload do Report de Testes com Falhas como Artifact
+    - name: Upload do Report de Testes como Artifact
       uses: actions/upload-artifact@v2.2.2
       if: always()
       env:
