@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 env:
-  IMAGEM_AZURECR: ${{ secrets.AZURECR_REGISTRY }}/apifinancas-dotnet5
+  IMAGEM_AZURECR: ${{ secrets.AZURECR_REGISTRY }}/apifinancask8s
   CAMINHO_PROJETO_TESTES: ./APIFinancas.Especificacoes
   CAMINHO_PROJETO_WEBAPP: ./APIFinancas
 
