@@ -10,7 +10,8 @@ env:
   IMAGEM_AZURECR: ${{ secrets.AZURECR_REGISTRY }}/apifinancask8s
   CAMINHO_PROJETO_TESTES: ./APIFinancas.Especificacoes
   CAMINHO_PROJETO_WEBAPP: ./APIFinancas
-
+  NAMESPACE_K8S: apifinancas
+  
 jobs:
   build-docker-tests-push-acr:
 
@@ -60,3 +61,44 @@ jobs:
         name: resultado-execucao-testes
         path: ${{ env.CAMINHO_RELATORIO_TESTES }}
         retention-days: 30
+
+  deployment-aks:
+    needs: [build-docker-tests-push-acr]
+    
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Azure Kubernetes Service - set context - Conectando ao cluster
+      uses: Azure/aks-set-context@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }} 
+        resource-group: ${{ env.AZURE_RESOURCE_GROUP_K8S }}
+        cluster-name:  ${{ env.AZURE_CLUSTER_K8S }}
+
+    - name: Azure Kubernetes Service - Criando Secret para acesso ao Container Registry
+      uses: Azure/k8s-create-secret@v1.1
+      with:
+        namespace: ${{ env.NAMESPACE_K8S }}
+        container-registry-url: ${{ secrets.AZURECR_REGISTRY }}
+        container-registry-username: ${{ secrets.AZURECR_USERNAME }}
+        container-registry-password: ${{ secrets.AZURECR_PASSWORD }}
+        secret-name: webapp-k8s-secret
+
+    - name: Configurar manifesto de Deployment
+      run: |
+        sed -i 's/CR-DEPLOYMENT/${{ secrets.AZURECR_REGISTRY }}/' ./manifests/deployment.yml
+        sed -i 's/TAG-DEPLOYMENT/${{ github.run_number }}/' ./manifests/deployment.yml
+
+    - name: Azure Kubernetes Service - Deployment de Web App
+      uses: Azure/k8s-deploy@v1.3
+      with:
+        namespace: ${{ env.NAMESPACE_K8S }}
+        manifests: |
+          manifests/deployment.yml
+          manifests/service.yml
+        images: |
+          '${{ env.IMAGEM_AZURECR }}:${{ github.run_number }}'
+        imagepullsecrets: |
+          webapp-k8s-secret
