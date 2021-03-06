@@ -10,6 +10,8 @@ env:
   IMAGEM_AZURECR: ${{ secrets.AZURECR_REGISTRY }}/apifinancask8s
   CAMINHO_PROJETO_TESTES: ./APIFinancas.Especificacoes
   CAMINHO_PROJETO_WEBAPP: ./APIFinancas
+  AZURE_RESOURCE_GROUP_K8S: TesteKubernetes
+  AZURE_CLUSTER_K8S: AKSCluster
   NAMESPACE_K8S: apifinancas
   
 jobs:
