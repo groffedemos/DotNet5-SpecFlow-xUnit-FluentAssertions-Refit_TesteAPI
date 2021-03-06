@@ -58,5 +58,5 @@ jobs:
         CAMINHO_RELATORIO_TESTES: ${{ env.CAMINHO_PROJETO_TESTES }}/TestResults/resultado-testes.html
       with:
         name: resultado-execucao-testes
-        path: ${{ env.CAMINHO_RELATORIO_ERROS }}
+        path: ${{ env.CAMINHO_RELATORIO_TESTES }}
         retention-days: 30
